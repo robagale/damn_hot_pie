@@ -1,40 +1,57 @@
-
 <!DOCTYPE html>
 <html>
 <head>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
-	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-	<script src="https://d14fo0winaifog.cloudfront.net/plotly-basic.js"></script>
-
+	<script src="https://cdn.plot.ly/plotly-2.8.3.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
+	<h1>Temperature and Humidity Display</h1>
 	<div>
-<div id="tester" style="width:600px;height:250px;"></div>
+<div id="tester" style="width:800px;height:400px;"></div>
 </div>
 </body>
 	<script>
-	Things = [];
-	x_data = [];
-	temperature_data = [];
-	humidity_data = [];
-	$.getJSON("{{request.url_root}}data/", function(data){ Things = data;
-	for (var i = 0; i < Things.length; i++) {
-		x_data.push(Things[i].date);
-		temperature_data.push(Things[i].temperature);
-		humidity_data.push(Things[i].humidity);
-	};
-});
-	var layout = {
-		margin: { t: 0 },
-		xaxis: {autorange: true},
-  		yaxis: {autorange: true}
-	};
-		
-	$(document).ready(function(){
-		d = [{x: x_data,y: temperature_data },{x: x_data,y: humidity_data }];
-	TESTER = document.getElementById('tester');
-	Plotly.plot( TESTER, d, layout);
 
-	})
+	$(document).ready(function(){
+	    $.getJSON("{{request.url_root}}data/", function(data) {
+                 plotit(data); 
+	    });
+        });
+
+
+	var layout = {
+		title: 'Temperateure and Humidty',
+		margin: { t: 0 },
+		xaxis: {
+			title: 'time',
+			autorange: true
+		},
+  		yaxis: {
+			title: 'value',
+			autorange: true
+		}
+	};
+
+		
+	function plotit(data) {
+        	Things = [];
+	        x_data = [];
+       		temperature_data = [];
+       		humidity_data = [];
+        	var trace1;
+        	var trace2;
+	    	for (let Thing of data ) {
+              		x_data.push(Thing.date);
+	      		temperature_data.push(Thing.temperature*9/5+32);
+	      		humidity_data.push(Thing.humidity);
+	    	}
+            	trace1 = {x:x_data, y:temperature_data, type: 'line', name:'Temperature',};
+            	trace2 = {x:x_data, y:humidity_data, type: 'line',name: 'Humidity',};
+       		var data = [trace1,trace2];
+		var d = data;
+		TESTER = document.getElementById('tester');
+		Plotly.react( TESTER, d, layout);
+	}
 </script>
 </html>
